@@ -1,6 +1,6 @@
-import { City } from './types';
+import { City, Country, CountryCode } from './types';
 
-export const ESTONIAN_CITIES: City[] = [
+const ESTONIAN_CITIES: City[] = [
   { id: 1, name: "Tallinn", coords: { lat: 59.4370, lng: 24.7536 } },
   { id: 2, name: "Tartu", coords: { lat: 58.3780, lng: 26.7290 } },
   { id: 3, name: "Narva", coords: { lat: 59.3796, lng: 28.1991 } },
@@ -22,3 +22,68 @@ export const ESTONIAN_CITIES: City[] = [
   { id: 19, name: "Saue", coords: { lat: 59.3242, lng: 24.5572 } },
   { id: 20, name: "Põltsamaa", coords: { lat: 58.6519, lng: 25.9686 } },
 ];
+
+const UKRAINIAN_CITIES: City[] = [
+    { id: 101, name: "Kyiv", coords: { lat: 50.4501, lng: 30.5234 } },
+    { id: 102, name: "Kharkiv", coords: { lat: 49.9935, lng: 36.2304 } },
+    { id: 103, name: "Odesa", coords: { lat: 46.4825, lng: 30.7233 } },
+    { id: 104, name: "Dnipro", coords: { lat: 48.4647, lng: 35.0462 } },
+    { id: 105, name: "Donetsk", coords: { lat: 48.0159, lng: 37.8028 } },
+    { id: 106, name: "Zaporizhzhia", coords: { lat: 47.8388, lng: 35.1396 } },
+    { id: 107, name: "Lviv", coords: { lat: 49.8397, lng: 24.0297 } },
+    { id: 108, name: "Kryvyi Rih", coords: { lat: 47.9105, lng: 33.3918 } },
+    { id: 109, name: "Mykolaiv", coords: { lat: 46.9750, lng: 31.9946 } },
+    { id: 110, name: "Mariupol", coords: { lat: 47.0951, lng: 37.5413 } },
+    { id: 111, name: "Luhansk", coords: { lat: 48.5740, lng: 39.3078 } },
+    { id: 112, name: "Vinnytsia", coords: { lat: 49.2331, lng: 28.4682 } },
+    { id: 113, name: "Makiivka", coords: { lat: 48.0569, lng: 37.9622 } },
+    { id: 114, name: "Sevastopol", coords: { lat: 44.6167, lng: 33.5254 } },
+    { id: 115, name: "Simferopol", coords: { lat: 44.9521, lng: 34.1024 } },
+    { id: 116, name: "Kherson", coords: { lat: 46.6354, lng: 32.6169 } },
+    { id: 117, name: "Poltava", coords: { lat: 49.5883, lng: 34.5514 } },
+    { id: 118, name: "Chernihiv", coords: { lat: 51.4982, lng: 31.2893 } },
+    { id: 119, name: "Cherkasy", coords: { lat: 49.4444, lng: 32.0598 } },
+    { id: 120, name: "Sumy", coords: { lat: 50.9077, lng: 34.7981 } },
+    { id: 121, name: "Zhytomyr", coords: { lat: 50.2547, lng: 28.6587 } },
+    { id: 122, name: "Horlivka", coords: { lat: 48.3033, lng: 38.0531 } },
+    { id: 123, name: "Rivne", coords: { lat: 50.6199, lng: 26.2516 } },
+    { id: 124, name: "Kropyvnytskyi", coords: { lat: 48.5079, lng: 32.2623 } },
+    { id: 125, name: "Kamianske", coords: { lat: 48.5195, lng: 34.6167 } },
+    { id: 126, name: "Ternopil", coords: { lat: 49.5535, lng: 25.5948 } },
+    { id: 127, name: "Kremenchuk", coords: { lat: 49.0655, lng: 33.4221 } },
+    { id: 128, name: "Lutsk", coords: { lat: 50.7472, lng: 25.3254 } },
+    { id: 129, name: "Ivano-Frankivsk", coords: { lat: 48.9226, lng: 24.7111 } },
+    { id: 130, name: "Bila Tserkva", coords: { lat: 49.7958, lng: 30.1149 } },
+    { id: 131, name: "Kramatorsk", coords: { lat: 48.7378, lng: 37.5842 } },
+    { id: 132, name: "Melitopol", coords: { lat: 46.8499, lng: 35.3671 } },
+    { id: 133, "name": "Kerch", "coords": { "lat": 45.3573, "lng": 36.4683 } },
+    { id: 134, "name": "Nikopol", "coords": { "lat": 47.5682, "lng": 34.3552 } },
+    { id: 135, "name": "Sloviansk", "coords": { "lat": 48.8542, "lng": 37.6010 } },
+    { id: 136, "name": "Berdiansk", "coords": { "lat": 46.7562, "lng": 36.7852 } },
+    { id: 137, "name": "Uzhhorod", "coords": { "lat": 48.6208, "lng": 22.2879 } },
+    { id: 138, "name": "Alchevsk", "coords": { "lat": 48.4728, "lng": 38.7953 } },
+    { id: 139, "name": "Pavlohrad", "coords": { "lat": 48.5200, "lng": 35.8700 } },
+    { id: 140, "name": "Yevpatoria", "coords": { "lat": 45.1901, "lng": 33.3610 } },
+    { id: 141, "name": "Lysychansk", "coords": { "lat": 48.9131, "lng": 38.4358 } },
+    { id: 142, "name": "Yalta", "coords": { "lat": 44.4991, "lng": 34.1699 } },
+    { id: 143, "name": "Chernivtsi", "coords": { "lat": 48.2921, "lng": 25.9358 } },
+];
+
+export const COUNTRIES_DATA: Record<CountryCode, Country> = {
+  ee: {
+    name: "Estonia",
+    cities: ESTONIAN_CITIES,
+    mapConfig: {
+      center: [58.59, 25.01],
+      zoom: 7,
+    },
+  },
+  ua: {
+    name: "Ukraine",
+    cities: UKRAINIAN_CITIES,
+    mapConfig: {
+      center: [48.3794, 31.1656],
+      zoom: 6,
+    },
+  },
+};

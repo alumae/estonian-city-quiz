@@ -1,15 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
-import { City } from '../types';
+import { City, MapConfig } from '../types';
 
 interface EstoniaMapProps {
   quizCities: City[];
   placedCities: Map<number, string>;
   onCityDrop: (droppedLatLng: L.LatLng, droppedCityName: string) => void;
   gameState: 'playing' | 'finished';
+  mapKey: string; // Used to force re-render of map
+  mapConfig: MapConfig;
 }
 
-const EstoniaMap: React.FC<EstoniaMapProps> = ({ quizCities, placedCities, onCityDrop, gameState }) => {
+const EstoniaMap: React.FC<EstoniaMapProps> = ({ quizCities, placedCities, onCityDrop, gameState, mapKey, mapConfig }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<Map<number, L.Marker>>(new Map());
@@ -19,30 +21,47 @@ const EstoniaMap: React.FC<EstoniaMapProps> = ({ quizCities, placedCities, onCit
 
   // Initialize map
   useEffect(() => {
-    if (mapRef.current || !mapContainerRef.current) return;
+    let timer: number;
+    if (mapContainerRef.current) {
+        // If a map instance exists, remove it before creating a new one
+        if (mapRef.current) {
+            mapRef.current.remove();
+        }
+        
+        const map = L.map(mapContainerRef.current, {
+            center: mapConfig.center,
+            zoom: mapConfig.zoom,
+            zoomControl: false,
+            attributionControl: false,
+            scrollWheelZoom: false,
+        });
+        mapRef.current = map;
 
-    const map = L.map(mapContainerRef.current, {
-        center: [58.59, 25.01],
-        zoom: 7,
-        zoomControl: false,
-        attributionControl: false,
-        scrollWheelZoom: false,
-    });
-    mapRef.current = map;
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          subdomains: 'abcd',
+          maxZoom: 19
+        }).addTo(map);
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd',
-      maxZoom: 19
-    }).addTo(map);
+        // This is a common fix for Leaflet in dynamic layouts.
+        // It ensures the map calculates its size correctly after the container has been rendered.
+        timer = window.setTimeout(() => {
+          map.invalidateSize();
+        }, 100);
+    }
     
     return () => {
-      map.remove();
-      mapRef.current = null;
+      if (timer) {
+        clearTimeout(timer);
+      }
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
     };
-  }, []);
+  }, [mapKey, mapConfig]); // Re-run effect if mapKey (country) or config changes
 
-  // Update map based on game state
+  // Update markers based on game state
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -84,9 +103,9 @@ const EstoniaMap: React.FC<EstoniaMapProps> = ({ quizCities, placedCities, onCit
                      tooltipContent = `<span class="font-bold text-red-300 line-through">${placedCityName}</span> <span class="font-bold text-green-300">${city.name}</span>`;
 
                      // Draw line to correct location
-                     const actualCityLocation = quizCities.find(c => c.name === placedCityName);
-                     if (actualCityLocation) {
-                         const line = L.polyline([city.coords, actualCityLocation.coords], {
+                     const actualCityData = quizCities.find(c => c.name === placedCityName);
+                     if (actualCityData) {
+                         const line = L.polyline([city.coords, actualCityData.coords], {
                              color: 'rgba(255, 255, 255, 0.4)',
                              weight: 1.5,
                              dashArray: '5, 10'
@@ -109,14 +128,22 @@ const EstoniaMap: React.FC<EstoniaMapProps> = ({ quizCities, placedCities, onCit
 
         const marker = L.marker(city.coords, { icon }).addTo(map);
 
-        if (tooltipContent || gameState === 'finished') {
+        if (tooltipContent || (gameState === 'finished' && placedCityName)) {
             marker.bindTooltip(tooltipContent, {
                 permanent: true,
                 direction: 'top',
                 offset: [0, -10],
                 className: 'custom-tooltip'
             }).openTooltip();
+        } else if (gameState === 'finished' && !placedCityName) {
+             marker.bindTooltip(tooltipContent, {
+                permanent: true,
+                direction: 'top',
+                offset: [0, -10],
+                className: 'custom-tooltip custom-tooltip-missed'
+            }).openTooltip();
         }
+
 
         markersRef.current.set(city.id, marker);
     });
@@ -155,7 +182,7 @@ const EstoniaMap: React.FC<EstoniaMapProps> = ({ quizCities, placedCities, onCit
           }
       });
       
-      const SNAP_THRESHOLD_METERS = 50000; // 50km
+      const SNAP_THRESHOLD_METERS = 75000; // 75km
       if (closestCity && minDistance < SNAP_THRESHOLD_METERS) {
           setHighlightedCityId(closestCity.id);
       } else {
@@ -182,6 +209,9 @@ const EstoniaMap: React.FC<EstoniaMapProps> = ({ quizCities, placedCities, onCit
             }
             .leaflet-tooltip-top.custom-tooltip::before {
                 border-top-color: #4A5568 !important;
+            }
+            .leaflet-tooltip.custom-tooltip-missed {
+                opacity: 0.7 !important;
             }
             .leaflet-container {
                 background: #111827; /* bg-gray-900 */
