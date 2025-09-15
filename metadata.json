@@ -1,0 +1,5 @@
+{
+  "name": "Estonia City Quiz",
+  "description": "A visual quiz to test your knowledge of Estonian cities. Drag city names from the sidebar and drop them onto their correct locations on the map of Estonia.",
+  "requestFramePermissions": []
+}
